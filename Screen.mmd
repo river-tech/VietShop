@@ -2,7 +2,6 @@ graph TD
     %% --- STYLES (UPDATED TEXT COLOR TO BLACK) ---
     classDef customer fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000000;
     classDef seller fill:#fff3e0,stroke:#f9a825,stroke-width:2px,color:#000000;
-    classDef shipper fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000000;
     classDef admin fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000000;
     classDef common fill:#ffffff,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5,color:#000000;
     classDef newScreen fill:#ffcdd2,stroke:#d32f2f,stroke-width:4px,color:#000000; 
@@ -10,244 +9,257 @@ graph TD
     %% ==========================================================
     %% APP 1: CLIENT SUPER APP (CUSTOMER & SELLER)
     %% ==========================================================
-    subgraph APP_CLIENT [📱 APP 1: CLIENT SUPER APP]
+    subgraph APP_CLIENT [APP 1: CLIENT SUPER APP]
         direction TB
 
         %% --- SHARED AUTH ---
         subgraph AUTH [Authentication]
-            CUS_SCR_001(CUS_SCR_001: Onboarding) --> CUS_SCR_002(CUS_SCR_002: Login)
-            CUS_SCR_002 --> CUS_SCR_003(CUS_SCR_003: Register)
-            CUS_SCR_002 --> CUS_SCR_004(CUS_SCR_004: Forgot Password)
+            CUS_SCR_001(CUS_SCR_001: Onboarding) --> CUS_SCR_002(CUS_SCR_002: Login):::customer
+            CUS_SCR_002 --> CUS_SCR_003(CUS_SCR_003: Register):::customer
+            CUS_SCR_002 --> CUS_SCR_004(CUS_SCR_004: Forgot Password):::customer
+            CUS_SCR_002 --> CUS_SCR_010(CUS_SCR_010: Auth Verification):::customer
         end
 
         %% --- CUSTOMER ROLE ---
-        subgraph ROLE_CUSTOMER [👤 Role: Customer]
+        subgraph ROLE_CUSTOMER [Role: Customer]
             direction TB
             
-            %% Main Navigation
-            CUS_SCR_002 --> CUS_SCR_005(CUS_SCR_005: Home Page):::customer
+            %% Entry after login
+            CUS_SCR_002 --> CUS_ENTRY[Customer Entry]:::customer
+
+            %% ===========================
+            %% PRODUCT & CATEGORY
+            %% ===========================
+            subgraph CUS_MOD_PRODUCT [Customer: Product & Category]
+                direction TB
+                CUS_SCR_053(CUS_SCR_053: Category Home):::customer
+                CUS_SCR_054(CUS_SCR_054: Subcategory Listing):::customer
+                CUS_SCR_055(CUS_SCR_055: Category Filter & Sort):::customer
+                CUS_SCR_007(CUS_SCR_007: Product Details):::customer
+                CUS_SCR_041(CUS_SCR_041: Shop Page):::customer
+                CUS_SCR_035(CUS_SCR_035: Wishlist):::customer
+            end
+
+            CUS_ENTRY --> CUS_SCR_053
+            CUS_SCR_053 --> CUS_SCR_054
+            CUS_SCR_054 --> CUS_SCR_055
+            CUS_SCR_054 --> CUS_SCR_007
+            CUS_SCR_007 --> CUS_SCR_041
+            CUS_SCR_007 -.->|Add/Remove from Wishlist| CUS_SCR_035
+
+            %% ===========================
+            %% ORDER / CHECKOUT / RETURN
+            %% ===========================
+            subgraph CUS_MOD_ORDER [Customer: Order & Return]
+                direction TB
+                CUS_SCR_008(CUS_SCR_008: Cart):::customer
+                CUS_SCR_009(CUS_SCR_009: Checkout):::customer
+                CUS_SCR_045(CUS_SCR_045: Order Result):::customer
+                CUS_SCR_030(CUS_SCR_030: Order History):::customer
+                CUS_SCR_031(CUS_SCR_031: Order Details):::customer
+                CUS_SCR_046(CUS_SCR_046: Return/Refund Request):::customer
+            end
+
+            CUS_SCR_007 -- Add to Cart --> CUS_SCR_008
+            CUS_SCR_008 --> CUS_SCR_009
+            CUS_SCR_009 --> CUS_SCR_045
+            CUS_SCR_045 --> CUS_SCR_030
+            CUS_SCR_030 --> CUS_SCR_031
+            CUS_SCR_031 --> CUS_SCR_046
             
-            %% Discovery Flow
-            CUS_SCR_005 --> CUS_SCR_029(CUS_SCR_029: Search):::customer
-            CUS_SCR_005 --> CUS_SCR_006(CUS_SCR_006: Product List):::customer
-            CUS_SCR_006 --> CUS_SCR_007(CUS_SCR_007: Product Details):::customer
-            CUS_SCR_007 --> CUS_SCR_036(CUS_SCR_036: Reviews):::customer
-            CUS_SCR_007 --> CUS_SCR_041(CUS_SCR_041: Shop Page):::customer
 
-            %% Shopping & Checkout Flow (UPDATED)
-            CUS_SCR_007 -- Add to Cart --> CUS_SCR_008(CUS_SCR_008: Cart):::customer
-            CUS_SCR_008 --> CUS_SCR_009(CUS_SCR_009: Checkout Info):::customer
-            CUS_SCR_009 -- Input Address/Voucher --> CUS_SCR_009B(CUS_SCR_009B: Confirm Order):::newScreen
-            CUS_SCR_009B -- Final Review --> CUS_SCR_045(CUS_SCR_045: Order Result):::customer
-            
-            %% Order Management
-            CUS_SCR_045 --> CUS_SCR_030(CUS_SCR_030: Order History):::customer
-            CUS_SCR_030 --> CUS_SCR_031(CUS_SCR_031: Order Details):::customer
-            CUS_SCR_031 --> CUS_SCR_037(CUS_SCR_037: Write Review):::customer
-
-            %% Ecosystem (Wallet & Game)
-            CUS_SCR_005 --> CUS_SCR_012(CUS_SCR_012: Wallet Overview):::customer
-            CUS_SCR_012 --> CUS_SCR_013(CUS_SCR_013: Deposit Wallet):::customer
-            CUS_SCR_012 --> CUS_SCR_014(CUS_SCR_014: Withdraw Wallet):::customer
-            CUS_SCR_012 --> CUS_SCR_015(CUS_SCR_015: Wallet History):::customer
-            CUS_SCR_005 --> CUS_SCR_016(CUS_SCR_016: Mini Game List):::customer
-            CUS_SCR_016 --> CUS_SCR_019(CUS_SCR_019: Water Tree):::customer
-            CUS_SCR_005 --> CUS_SCR_020(CUS_SCR_020: Livestream List):::customer
-            CUS_SCR_020 --> CUS_SCR_021(CUS_SCR_021: Livestream Room):::customer
-            
-            %% Personal
-            CUS_SCR_005 --> CUS_SCR_032(CUS_SCR_032: Profile):::customer
-            CUS_SCR_032 --> CUS_SCR_034(CUS_SCR_034: Settings):::customer
-            CUS_SCR_032 --> CUS_SCR_028(CUS_SCR_028: Notifications):::customer
-
-            %% ==========================================================
-            %% CUSTOMER MODULES VIEW (Profile / Mini Game / Product / Wallet / Order)
-            %% (Only adding groupings & cross-module flows, existing nodes/edges kept)
-            %% ==========================================================
-
-            %% --- PRODUCT MODULE ---
-            subgraph MOD_PRODUCT [🛒 Module: Product & Discovery]
+            %% ===========================
+            %% REVIEW
+            %% ===========================
+            subgraph CUS_MOD_REVIEW [Customer: Review]
                 direction TB
-                CUS_SCR_005
-                CUS_SCR_029
-                CUS_SCR_006
-                CUS_SCR_007
-                CUS_SCR_036
-                CUS_SCR_041
+                CUS_SCR_037(CUS_SCR_037: Write Review):::customer
+                CUS_SCR_039(CUS_SCR_039: Edit Review):::customer
+                CUS_SCR_040(CUS_SCR_040: Review List):::customer
             end
 
-            %% --- ORDER MODULE ---
-            subgraph MOD_ORDER [📦 Module: Order]
+            CUS_SCR_031 --> CUS_SCR_037
+            CUS_SCR_037 --> CUS_SCR_040
+            CUS_SCR_037 -.-> CUS_SCR_039
+
+            %% ===========================
+            %% WALLET
+            %% ===========================
+            subgraph CUS_MOD_WALLET [Customer: Wallet]
                 direction TB
-                CUS_SCR_008
-                CUS_SCR_009
-                CUS_SCR_009B
-                CUS_SCR_045
-                CUS_SCR_030
-                CUS_SCR_031
-                CUS_SCR_037
+                CUS_SCR_012(CUS_SCR_012: Wallet Overview):::customer
+                CUS_SCR_013(CUS_SCR_013: Deposit Wallet):::customer
+                CUS_SCR_014(CUS_SCR_014: Withdraw Wallet):::customer
+                CUS_SCR_015(CUS_SCR_015: Wallet History):::customer
+                CUS_SCR_048(CUS_SCR_048: Wallet Promotions):::customer
+                CUS_SCR_050(CUS_SCR_050: Top-up Methods):::customer
+                CUS_SCR_051(CUS_SCR_051: Linked Bank Accounts):::customer
+                CUS_SCR_052(CUS_SCR_052: Wallet Settings):::customer
             end
 
-            %% --- WALLET MODULE ---
-            subgraph MOD_WALLET [💰 Module: Wallet]
-                direction TB
-                CUS_SCR_012
-                CUS_SCR_013
-                CUS_SCR_014
-                CUS_SCR_015
-            end
-
-            %% --- MINI GAME MODULE ---
-            subgraph MOD_MINIGAME [🎮 Module: Mini Game]
-                direction TB
-                CUS_SCR_016
-                CUS_SCR_019
-            end
-
-            %% --- LIVE STREAM MODULE ---
-            subgraph MOD_LIVE [📺 Module: Live Stream]
-                direction TB
-                CUS_SCR_020
-                CUS_SCR_021
-            end
-
-            %% --- PROFILE MODULE ---
-            subgraph MOD_PROFILE [🙍‍♂️ Module: Profile]
-                direction TB
-                CUS_SCR_032
-                CUS_SCR_034
-                CUS_SCR_028
-            end
-
-            %% --- CROSS-MODULE REDIRECTION FLOWS ---
-
-            %% Product → Order
-            CUS_SCR_007 -.->|Add to Cart & Checkout| CUS_SCR_008
-            CUS_SCR_009B -.->|Order Created| CUS_SCR_045
-            CUS_SCR_045 -.->|View Order History| CUS_SCR_030
-
-            %% Order → Product
-            CUS_SCR_031 -.->|Buy Again| CUS_SCR_007
-
-            %% Product → Wallet
+            CUS_ENTRY --> CUS_SCR_012
+            CUS_SCR_012 --> CUS_SCR_013
+            CUS_SCR_012 --> CUS_SCR_014
+            CUS_SCR_012 --> CUS_SCR_015
+            CUS_SCR_012 --> CUS_SCR_048
+            CUS_SCR_012 --> CUS_SCR_050
+            CUS_SCR_012 --> CUS_SCR_051
+            CUS_SCR_012 --> CUS_SCR_052
+            CUS_SCR_013 -.-> CUS_SCR_015
+            CUS_SCR_014 -.-> CUS_SCR_015
             CUS_SCR_009 -.->|Select Wallet Payment| CUS_SCR_012
 
-            %% Wallet → Order / Product
-            CUS_SCR_012 -.->|Back to Checkout Confirm| CUS_SCR_009B
-            CUS_SCR_012 -.->|View Order History| CUS_SCR_030
-            CUS_SCR_012 -.->|Top-up Wallet| CUS_SCR_013
-            CUS_SCR_012 -.->|Withdraw to Bank| CUS_SCR_014
-            CUS_SCR_013 -.->|View Wallet History| CUS_SCR_015
-            CUS_SCR_014 -.->|View Wallet History| CUS_SCR_015
+            %% ===========================
+            %% CHAT
+            %% ===========================
+            subgraph CUS_MOD_CHAT [Customer: Chat]
+                direction TB
+                CUS_SCR_056(CUS_SCR_056: Chat List):::customer
+                CUS_SCR_057(CUS_SCR_057: Chat Detail):::customer
+                CUS_SCR_058(CUS_SCR_058: Chat from Product):::customer
+            end
 
-            %% Checkout → Wallet Top-up
-            CUS_SCR_009B -.->|Insufficient balance? Top-up| CUS_SCR_013
+            CUS_ENTRY --> CUS_SCR_056
+            CUS_SCR_056 --> CUS_SCR_057
+            CUS_SCR_007 -.-> CUS_SCR_058
 
-            %% Mini Game → Product / Wallet
-            CUS_SCR_019 -.->|Redeem Voucher on Product| CUS_SCR_007
-            CUS_SCR_019 -.->|Receive Coins in Wallet| CUS_SCR_012
+            %% ===========================
+            %% NOTIFICATION
+            %% ===========================
+            subgraph CUS_MOD_NOTI [Customer: Notification]
+                direction TB
+                CUS_SCR_059(CUS_SCR_059: Notification Center):::customer
+                CUS_SCR_060(CUS_SCR_060: Notification Detail):::customer
+                CUS_SCR_061(CUS_SCR_061: Notification Settings):::customer
+            end
 
-            %% Live Stream → Product / Order
-            CUS_SCR_021 -.->|View Product from Live| CUS_SCR_007
-            CUS_SCR_021 -.->|Add to Cart from Live| CUS_SCR_008
+            CUS_ENTRY --> CUS_SCR_059
+            CUS_SCR_059 --> CUS_SCR_060
+            CUS_SCR_059 --> CUS_SCR_061
 
-            %% Profile → Other Modules
-            CUS_SCR_032 -.->|Go to Wallet| CUS_SCR_012
-            CUS_SCR_032 -.->|Go to Order History| CUS_SCR_030
-            CUS_SCR_032 -.->|Go to Mini Game| CUS_SCR_016
-            CUS_SCR_032 -.->|View Notifications| CUS_SCR_028
+            %% ===========================
+            %% PROFILE
+            %% ===========================
+            subgraph CUS_MOD_PROFILE [Customer: Profile]
+                direction TB
+                CUS_SCR_062(CUS_SCR_062: Profile Overview):::customer
+                CUS_SCR_063(CUS_SCR_063: Edit Profile):::customer
+                CUS_SCR_064(CUS_SCR_064: Address Management):::customer
+                CUS_SCR_065(CUS_SCR_065: Security Settings):::customer
+                CUS_SCR_066(CUS_SCR_066: Preferences):::customer
+            end
 
-            %% Global return paths to Home
-            CUS_SCR_030 -.->|Back to Home| CUS_SCR_005
-            CUS_SCR_012 -.->|Back to Home| CUS_SCR_005
-            CUS_SCR_016 -.->|Back to Home| CUS_SCR_005
-            CUS_SCR_020 -.->|Back to Home| CUS_SCR_005
-            CUS_SCR_021 -.->|Back to Home| CUS_SCR_005
+            CUS_ENTRY --> CUS_SCR_062
+            CUS_SCR_062 --> CUS_SCR_063
+            CUS_SCR_062 --> CUS_SCR_064
+            CUS_SCR_062 --> CUS_SCR_065
+            CUS_SCR_062 --> CUS_SCR_066
+
+            %% Profile shortcuts to key modules
+            CUS_SCR_062 -.->|Go to Wallet| CUS_SCR_012
+            CUS_SCR_062 -.->|Go to Order History| CUS_SCR_030
+            CUS_SCR_062 -.->|View Notifications| CUS_SCR_059
         end
 
         %% --- SELLER ROLE ---
-        subgraph ROLE_SELLER [🏪 Role: Seller]
+        subgraph ROLE_SELLER [Role: Seller]
             direction TB
             
-            %% Switch Role
-            CUS_SCR_032 -.->|Switch to Seller Channel| SEL_SCR_001(SEL_SCR_001: Seller Login/Auth):::seller
-            SEL_SCR_001 --> SEL_SCR_002(SEL_SCR_002: Seller Dashboard):::seller
+            %% Switch Role / Entry
+            CUS_SCR_062 -.->|Switch to Seller Channel| SEL_ENTRY[Seller Entry]:::seller
 
-            %% Seller Modules
-            SEL_SCR_002 --> SEL_PROD[Product Mgmt]:::seller
-            SEL_PROD --> SEL_SCR_003(SEL_SCR_003: Product List):::seller
-            SEL_SCR_003 --> SEL_SCR_004(SEL_SCR_004: Create Product):::seller
-            
-            SEL_SCR_002 --> SEL_ORDER[Order Mgmt]:::seller
-            SEL_ORDER --> SEL_SCR_009(SEL_SCR_009: Order List):::seller
-            SEL_SCR_009 --> SEL_SCR_010(SEL_SCR_010: Order Detail):::seller
-            SEL_SCR_010 --> SEL_SCR_011(SEL_SCR_011: Process Order):::seller
-
-            SEL_SCR_002 --> SEL_LIVE[Livestream]:::seller
-            SEL_LIVE --> SEL_SCR_016(SEL_SCR_016: Create Live):::seller
-            
-            %% New Seller Features
-            SEL_SCR_002 --> SEL_REFUND[Return/Refund]:::newScreen
-            SEL_REFUND --> SEL_SCR_026(SEL_SCR_026: Return List):::newScreen
-            SEL_SCR_026 --> SEL_SCR_027(SEL_SCR_027: Return Details):::newScreen
-            
-            SEL_SCR_002 --> SEL_NOTI[Notifications]:::newScreen
-            SEL_NOTI --> SEL_SCR_028(SEL_SCR_028: Noti Center):::newScreen
-            SEL_SCR_028 --> SEL_SCR_029(SEL_SCR_029: Noti Settings):::newScreen
-
-            %% ==========================================================
-            %% SELLER MODULES VIEW (Product / Order / Livestream / Notifications)
-            %% ==========================================================
-
-            %% --- SELLER PRODUCT MODULE ---
-            subgraph MOD_SELLER_PRODUCT [🏪 Seller Module: Product]
+            %% ===========================
+            %% SELLER PRODUCT & INVENTORY
+            %% ===========================
+            subgraph SEL_MOD_PRODUCT [Seller: Product & Inventory]
                 direction TB
-                SEL_PROD
-                SEL_SCR_003
-                SEL_SCR_004
+                SEL_SCR_007_INVENTORY(SEL_SCR_007: Inventory Management):::seller
+                SEL_SCR_030_ADD_BASIC(SEL_SCR_030: Add Product - Basic Info):::seller
+                SEL_SCR_031_ADD_SALES(SEL_SCR_031: Add Product - Sales Info):::seller
+                SEL_SCR_032_EDIT_PRODUCT(SEL_SCR_032: Edit Product):::seller
+                SEL_SCR_023_VOUCHER(SEL_SCR_023: Voucher Management):::seller
+                SEL_SCR_025_REVIEW(SEL_SCR_025: Product Review Management):::seller
             end
 
-            %% --- SELLER ORDER MODULE ---
-            subgraph MOD_SELLER_ORDER [📦 Seller Module: Order]
+            SEL_ENTRY --> SEL_SCR_007_INVENTORY
+            SEL_SCR_007_INVENTORY --> SEL_SCR_030_ADD_BASIC
+            SEL_SCR_030_ADD_BASIC --> SEL_SCR_031_ADD_SALES
+            SEL_SCR_031_ADD_SALES --> SEL_SCR_007_INVENTORY
+            SEL_SCR_007_INVENTORY --> SEL_SCR_032_EDIT_PRODUCT
+            SEL_SCR_007_INVENTORY --> SEL_SCR_023_VOUCHER
+            SEL_SCR_007_INVENTORY --> SEL_SCR_025_REVIEW
+
+            %% ===========================
+            %% SELLER ORDER & REFUND
+            %% ===========================
+            subgraph SEL_MOD_ORDER [Seller: Order & Refund]
                 direction TB
-                SEL_ORDER
-                SEL_SCR_009
-                SEL_SCR_010
-                SEL_SCR_011
+                SEL_SCR_009(SEL_SCR_009: Order List):::seller
+                SEL_SCR_010(SEL_SCR_010: Order Details):::seller
+                SEL_SCR_011(SEL_SCR_011: Order Processing):::seller
+                SEL_SCR_026_RETURN(SEL_SCR_026: Return/Refund List):::seller
+                SEL_SCR_027_RETURN(SEL_SCR_027: Return/Refund Details):::seller
             end
 
-            %% --- SELLER LIVESTREAM MODULE ---
-            subgraph MOD_SELLER_LIVE [📺 Seller Module: Livestream]
+            SEL_ENTRY --> SEL_SCR_009
+            SEL_SCR_009 --> SEL_SCR_010
+            SEL_SCR_010 --> SEL_SCR_011
+            SEL_SCR_010 -.-> SEL_SCR_026_RETURN
+            SEL_SCR_026_RETURN --> SEL_SCR_027_RETURN
+
+            %% ===========================
+            %% SELLER NOTIFICATION
+            %% ===========================
+            subgraph SEL_MOD_NOTI [Seller: Notification]
                 direction TB
-                SEL_LIVE
-                SEL_SCR_016
+                SEL_SCR_028_NOTI(SEL_SCR_028: Seller Notifications):::seller
+                SEL_SCR_029_NOTI_SETTING(SEL_SCR_029: Notification Settings):::seller
             end
 
-            %% --- SELLER NOTIFICATION MODULE ---
-            subgraph MOD_SELLER_NOTI [🔔 Seller Module: Notifications]
+            SEL_ENTRY --> SEL_SCR_028_NOTI
+            SEL_SCR_028_NOTI --> SEL_SCR_029_NOTI_SETTING
+
+            %% ===========================
+            %% SELLER SETTINGS
+            %% ===========================
+            subgraph SEL_MOD_SETTING [Seller: Settings]
                 direction TB
-                SEL_NOTI
-                SEL_SCR_028
-                SEL_SCR_029
+                SEL_SCR_020_INCIDENT(SEL_SCR_020: Incident Report):::seller
+                SEL_SCR_021_PROFILE(SEL_SCR_021: Seller Profile):::seller
+                SEL_SCR_022_SHOP_SETTINGS(SEL_SCR_022: Shop Settings):::seller
             end
 
-            %% --- SELLER CROSS-MODULE FLOWS ---
+            SEL_ENTRY --> SEL_SCR_021_PROFILE
+            SEL_SCR_021_PROFILE --> SEL_SCR_020_INCIDENT
+            SEL_SCR_021_PROFILE --> SEL_SCR_022_SHOP_SETTINGS
 
-            %% Product → Order
-            SEL_SCR_003 -.->|Check orders for product| SEL_SCR_009
-            SEL_SCR_004 -.->|View related orders| SEL_SCR_009
+            %% ===========================
+            %% SELLER CHAT
+            %% ===========================
+            subgraph SEL_MOD_CHAT [Seller: Chat]
+                direction TB
+                SEL_SCR_025_CHAT(SEL_SCR_025: Seller Chat List):::seller
+                SEL_SCR_026_CHAT(SEL_SCR_026: Seller Chat Detail):::seller
+                SEL_SCR_027_CHAT(SEL_SCR_027: Chat From Product):::seller
+            end
 
-            %% Order → Refund
-            SEL_SCR_010 -.->|Create/Manage return| SEL_SCR_026
-            SEL_SCR_026 -.->|View order details| SEL_SCR_010
+            SEL_ENTRY --> SEL_SCR_025_CHAT
+            SEL_SCR_025_CHAT --> SEL_SCR_026_CHAT
+            SEL_SCR_032_EDIT_PRODUCT -.-> SEL_SCR_027_CHAT
 
-            %% Livestream → Product / Order
-            SEL_SCR_016 -.->|Manage products in live| SEL_SCR_003
-            SEL_SCR_016 -.->|Track live orders| SEL_SCR_009
+            %% ===========================
+            %% SELLER WALLET
+            %% ===========================
+            subgraph SEL_MOD_WALLET [Seller: Wallet]
+                direction TB
+                SEL_SCR_030_WALLET(SEL_SCR_030: Seller Wallet Overview):::seller
+                SEL_SCR_031_PAYOUT(SEL_SCR_031: Payout History):::seller
+                SEL_SCR_032_WITHDRAW(SEL_SCR_032: Withdraw Request):::seller
+            end
 
-            %% Notifications → Product / Order
-            SEL_SCR_028 -.->|Order-related notifications| SEL_SCR_009
-            SEL_SCR_028 -.->|Product-related notifications| SEL_SCR_003
+            SEL_ENTRY --> SEL_SCR_030_WALLET
+            SEL_SCR_030_WALLET --> SEL_SCR_031_PAYOUT
+            SEL_SCR_030_WALLET --> SEL_SCR_032_WITHDRAW
         end
     end
 
@@ -260,27 +272,141 @@ graph TD
     %% ==========================================================
     %% WEB ADMIN PORTAL
     %% ==========================================================
-    subgraph WEB_ADMIN [💻 WEB ADMIN PORTAL]
+    subgraph WEB_ADMIN [WEB ADMIN PORTAL]
         direction TB
-        ADM_SCR_001(ADM_SCR_001: Admin Login):::admin --> ADM_SCR_002(ADM_SCR_002: Dashboard):::admin
-        
-        ADM_SCR_002 --> ADM_GRP_USER[User & Seller Mgmt]:::admin
-        ADM_GRP_USER --> ADM_SCR_003(User Mgmt):::admin
-        ADM_GRP_USER --> ADM_SCR_004(Seller Mgmt):::admin
+        ADM_SCR_001(ADM_SCR_001: Admin Login):::admin -->|Login Success| ADM_SCR_002(ADM_SCR_002: Admin Dashboard):::admin
 
-        ADM_SCR_002 --> ADM_GRP_PROD[Product & Order]:::admin
-        ADM_GRP_PROD --> ADM_SCR_005(Product Approval):::admin
-        ADM_GRP_PROD --> ADM_SCR_007(Order Mgmt):::admin
-        
-        ADM_SCR_002 --> ADM_GRP_SYS[System & CMS]:::admin
-        ADM_GRP_SYS --> ADM_SCR_020(Banner CMS):::admin
-        ADM_GRP_SYS --> ADM_SCR_011(Wallet Mgmt):::admin
+        %% ===========================
+        %% USER MANAGEMENT
+        %% ===========================
+        subgraph ADM_GRP_USER [User Management]
+            direction LR
+            ADM_SCR_003(ADM_SCR_003: User Management):::admin
+            ADM_SCR_034(ADM_SCR_034: User Details):::admin
+        end
+        ADM_SCR_002 -->|Manage Users| ADM_GRP_USER
+        ADM_SCR_003 -->|View User Details| ADM_SCR_034
+
+        %% ===========================
+        %% SELLER MANAGEMENT
+        %% ===========================
+        subgraph ADM_GRP_SELLER [Seller Management]
+            direction LR
+            ADM_SCR_004(ADM_SCR_004: Seller Management):::admin
+            ADM_SCR_035(ADM_SCR_035: Seller Details):::admin
+        end
+        ADM_SCR_002 -->|Manage Sellers| ADM_GRP_SELLER
+        ADM_SCR_004 -->|View Seller Details| ADM_SCR_035
+
+        %% ===========================
+        %% PRODUCT MANAGEMENT
+        %% ===========================
+        subgraph ADM_GRP_PROD [Product Management]
+            direction LR
+            ADM_SCR_005(ADM_SCR_005: Product Approval):::admin
+            ADM_SCR_006(ADM_SCR_006: Product Management):::admin
+        end
+        ADM_SCR_002 -->|Manage Products| ADM_GRP_PROD
+        ADM_SCR_005 -->|Approve & Manage| ADM_SCR_006
+
+        %% ===========================
+        %% ORDER MANAGEMENT
+        %% ===========================
+        subgraph ADM_GRP_ORDER [Order Management]
+            direction LR
+            ADM_SCR_007(ADM_SCR_007: Order Management):::admin
+            ADM_SCR_008(ADM_SCR_008: Order Details):::admin
+        end
+        ADM_SCR_002 -->|Manage Orders| ADM_GRP_ORDER
+        ADM_SCR_007 -->|View Order Details| ADM_SCR_008
+
+        %% ===========================
+        %% FINANCE
+        %% ===========================
+        subgraph ADM_GRP_FINANCE [Finance]
+            direction LR
+            ADM_SCR_010(ADM_SCR_010: Transaction Management):::admin
+            ADM_SCR_011(ADM_SCR_011: Wallet Management):::admin
+        end
+        ADM_SCR_002 -->|Manage Finance| ADM_GRP_FINANCE
+        ADM_SCR_010 -->|Manage Wallets| ADM_SCR_011
+
+        %% ===========================
+        %% DISPUTE MANAGEMENT
+        %% ===========================
+        subgraph ADM_GRP_DISPUTE [Dispute Management]
+            direction LR
+            ADM_SCR_028(ADM_SCR_028: Dispute List):::admin
+            ADM_SCR_029(ADM_SCR_029: Dispute Details):::admin
+            ADM_SCR_030(ADM_SCR_030: Dispute Resolution History):::admin
+        end
+        ADM_SCR_002 -->|Handle Disputes| ADM_GRP_DISPUTE
+        ADM_SCR_028 -->|View Dispute Details| ADM_SCR_029
+        ADM_SCR_029 -->|View Resolution History| ADM_SCR_030
+
+        %% ===========================
+        %% ANALYTICS
+        %% ===========================
+        ADM_SCR_019(ADM_SCR_019: Analytics Dashboard):::admin
+        ADM_SCR_002 -->|View Analytics| ADM_SCR_019
+
+        %% ===========================
+        %% REVIEW MODERATION
+        %% ===========================
+        ADM_SCR_027(ADM_SCR_027: Review Moderation):::admin
+        ADM_SCR_002 -->|Moderate Reviews| ADM_SCR_027
+
+        %% ===========================
+        %% PERMISSION & ADMIN SETTINGS
+        %% ===========================
+        subgraph ADM_GRP_ADMIN [Admin Settings]
+            direction LR
+            ADM_SCR_023(ADM_SCR_023: Role & Permission):::admin
+            ADM_SCR_024(ADM_SCR_024: Admin Account):::admin
+            ADM_SCR_025(ADM_SCR_025: Audit Log):::admin
+        end
+        ADM_SCR_002 -->|Admin Settings| ADM_GRP_ADMIN
+
+        %% ===========================
+        %% SYSTEM CONFIGURATION
+        %% ===========================
+        subgraph ADM_GRP_SYS [System Configuration]
+            direction LR
+            ADM_SCR_031(ADM_SCR_031: Platform Fee Settings):::admin
+            ADM_SCR_032(ADM_SCR_032: Refund Policy Settings):::admin
+            ADM_SCR_033(ADM_SCR_033: System Alert Thresholds):::admin
+        end
+        ADM_SCR_002 -->|System Configuration| ADM_GRP_SYS
+
+        %% ===========================
+        %% ENVIRONMENT (OUT OF SCOPE)
+        %% ===========================
+        subgraph ADM_GRP_ENV [Environment - Out of Scope]
+            direction LR
+            ADM_SCR_013(ADM_SCR_013: Review Tree Report):::common
+            ADM_SCR_014(ADM_SCR_014: Real Tree Management):::common
+            ADM_SCR_015(ADM_SCR_015: Tree Fund Management):::common
+            ADM_SCR_016(ADM_SCR_016: Environment Report):::common
+            ADM_SCR_017(ADM_SCR_017: Location Management):::common
+        end
+        ADM_SCR_002 -.->|Environment Optional| ADM_GRP_ENV
     end
+    
 
     %% --- EXTERNAL SHIPPING PROVIDER (OUT OF SCOPE) ---
     EXT_SHIP["External Shipping Provider - Out of scope"]:::common
 
     %% --- CROSS CONNECTIONS ---
-    CUS_SCR_009B -.->|Create Order| SEL_SCR_009
+    %% Customer creates order -> Seller sees in Order List
+    CUS_SCR_045 -.->|Order Created| SEL_SCR_009
+    CUS_SCR_031 -.->|Order Details Viewed| SEL_SCR_009
+     
+
+    %% Return/Refund escalation
+    CUS_SCR_046 -.->|Return/Refund Request| SEL_SCR_026_RETURN
+    SEL_SCR_026_RETURN -.->|Escalate Dispute| ADM_SCR_028
+
+    %% Seller -> External Shipping Provider -> Customer
     SEL_SCR_011 -.->|Hand over shipment| EXT_SHIP
-    EXT_SHIP -.->|Delivery status update| CUS_SCR_031
+    EXT_SHIP -.-> CUS_SCR_031
+    
